@@ -1,5 +1,26 @@
 import random
 
+def printMatrix(matrix):
+    print("\nMATRIX\n    ", end="")
+    for i in range(len(matrix)):
+        print(i, end=" ")
+    print()
+
+    for row in range(len(matrix)):
+        print(row, ".", end=" ")
+        for col in range(len(matrix[row])):
+            print(matrix[row][col], end=" ")
+        print()
+
+def printList(list):
+    print("\nLIST")
+    for row in range(len(list)):
+        print(row, ".", end=" ")
+        for col in range(len(list[row])):
+            print(list[row][col], end=" ")
+        print()
+
+
 def generateUWG(v: int, saturation: int, weight = 9):
     # generowanie nieskierowanego ważonego grafu spójnego w postaci macierzy sąsiedztwa i listy incydencji
     # v – liczba wierzchołków, saturation – nasycenie w %, weight – maksymalne wagi krawędzi
@@ -44,31 +65,46 @@ def generateUWG(v: int, saturation: int, weight = 9):
     # IDEA: dla optymalizacji można dodać zbiór wierzchołków, do których nie da się już dodać krawędzi
     return (matrix, list)
 
-def generateDAG():
-    return 0
+def generateDAG(v: int, saturation: int):
+    # generowanie skierowanego acyklicznego grafu spójnego w postaci macierzy sąsiedztwa i listy incydencji
+    # v – liczba wierzchołków, saturation – nasycenie w %
+
+    e = v*(v-1)/2 * (200 - saturation)/100              # ilośc krawędzi do usunięcia (na początku mamy 200% krawędzi)
+    print(e)
+
+    matrix = [[1 for i in range(v)]for i in range(v)]   # wygenerowanie grafu pełnego
+    # TODO: usunąć krawędzie "dwustronne"
+    list = [[]for i in range(v)]
+
+    if e<(v-1):
+        print("Unable to generate connected graph")
+        return -1
+
+    # drzewo jest grafem acyklicznym – opieramy się na drzewie
+    for i in range(v):
+        matrix[i][i] = 0               # usuwa pętle własne
+
+    root = random.randrange(v)         # losuje korzeń
+    for i in range(v):                 # do korzenia nie może nic wchodzić
+        matrix[root][i] = 0
+
+    leaf = random.randrange(v)         # losuje liść
+    for i in range(v):                 # do korzenia nie może nic wchodzić
+        matrix[i][leaf] = 0            # z liścia nie może nic wychodzić
+
+    e-=2*v-2                           # pętle własne już były usunięte
+
+    print(root, leaf, e)
+    printMatrix(matrix)
+
+    # TODO: usunąć losowe krawędzie
+
+    return matrix, list
 
 
-def printMatrix(matrix):
-    print("\nMATRIX\n    ", end="")
-    for i in range(len(matrix)):
-        print(i, end=" ")
-    print()
 
-    for row in range(len(matrix)):
-        print(row, ".", end=" ")
-        for col in range(len(matrix[row])):
-            print(matrix[row][col], end=" ")
-        print()
-
-def printList(list):
-    print("\nLIST")
-    for row in range(len(list)):
-        print(row, ".", end=" ")
-        for col in range(len(list[row])):
-            print(list[row][col], end=" ")
-        print()
 
 if __name__ == '__main__':
-    matrix, list = generateUWG(5, 60)
-    printMatrix(matrix)
-    printList(list)
+    matrix, list = generateDAG(5, 60)
+    # printMatrix(matrix)
+    # printList(list)
