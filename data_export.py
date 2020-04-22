@@ -9,6 +9,15 @@ def measure_time(function, data: list, vbegin: int):
     duration = end - start
     return duration
 
+def measure_time(function, data: list):
+    # IDEA: zrobić tuple "parameters" rozpakowywaną we wnętrzu każdej funkcji
+    start = time.clock()
+    function(data)
+    end = time.clock()
+
+    duration = end - start
+    return duration
+
 def export_data_to_file(filename: str, data: float):
     file = open(filename,"a")
     file.write("{0:02f}\n".format(data))
