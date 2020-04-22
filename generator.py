@@ -98,24 +98,24 @@ def generateDAG(v: int, saturation: int):
 
     root = random.randrange(v)         # losuje korzeń
     for i in range(v):                 # do korzenia nie może nic wchodzić
-        matrix[root][i] = 0
+        matrix[i][root] = 0
     e-=v-1    # pętla własna już była usunięta
 
     leaf = root
     while root==leaf:
         leaf = random.randrange(v)         # losuje liść
     for i in range(v):                     # z liścia nie może nic wychodzić
-        if matrix[i][leaf] == 1:
-            matrix[i][leaf] = 0
+        if matrix[leaf][i] == 1:
+            matrix[leaf][i] = 0
             e-=1
 
     for i in range(v-1):                    # zamienia krawędzie dwustronne na jednostronne
         for j in range(i+1, v):
             if (matrix[i][j]*matrix[j][i]==1):
-                if(random.randrange(2)==0):     # losuje, którą krawędź usunąć
-                    matrix[i][j]=0
-                else:
-                    matrix[j][i]=0
+                # if(random.randrange(2)==0):     # losuje, którą krawędź usunąć
+                #     matrix[i][j]=0
+                # else:
+                matrix[j][i]=0
                 e-=1
 
     while(e>0):                                 # usuwa losowe krawędzie
@@ -130,8 +130,7 @@ def generateDAG(v: int, saturation: int):
             i+=1
 
     list = matrixToList(matrix)
-    return matrix, list
-
+    return matrix, list, root
 
 if __name__ == '__main__':
     matrix, list = generateDAG(5, 60)
