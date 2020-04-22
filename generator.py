@@ -20,12 +20,22 @@ def printList(list):
             print(list[row][col], end=" ")
         print()
 
+def matrixToList(matrix):
+    # tworzy listę incydencji na podstawie macierzy sąsiedztwa
+    v = len(matrix)
+    list = [[]for i in range(v)]
+
+    for vout in range(v):
+        for vin in range(v):
+            if matrix[vout][vin]==1:
+                list[vout].append(vin)
+    return list
 
 def generateUWG(v: int, saturation: int, weight = 9):
     # generowanie nieskierowanego ważonego grafu spójnego w postaci macierzy sąsiedztwa i listy incydencji
     # v – liczba wierzchołków, saturation – nasycenie w %, weight – maksymalne wagi krawędzi
 
-    e = v*(v-1)/2 * saturation/100
+    e = round(v*(v-1)/2 * saturation/100)
     matrix = [[0 for i in range(v)]for i in range(v)]
     list = [[]for i in range(v)]
 
@@ -48,7 +58,7 @@ def generateUWG(v: int, saturation: int, weight = 9):
         vout = vin
 
     e-=v-1                                      # dodaje pozostałe krawędzie
-    while(e!=0):
+    while(e>0):
         vout = random.randrange(v)              # losuje wierzchołek początkowy...
         i = 0
         while (i<v):
@@ -61,6 +71,7 @@ def generateUWG(v: int, saturation: int, weight = 9):
                 list[vout].append((vin, w))
                 list[vin].append((vout, w))
                 e-=1
+                break
             i+=1
     # IDEA: dla optymalizacji można dodać zbiór wierzchołków, do których nie da się już dodać krawędzi
     return (matrix, list)
@@ -69,42 +80,60 @@ def generateDAG(v: int, saturation: int):
     # generowanie skierowanego acyklicznego grafu spójnego w postaci macierzy sąsiedztwa i listy incydencji
     # v – liczba wierzchołków, saturation – nasycenie w %
 
-    e = v*(v-1)/2 * (200 - saturation)/100              # ilośc krawędzi do usunięcia (na początku mamy 200% krawędzi)
-    print(e)
-
-    matrix = [[1 for i in range(v)]for i in range(v)]   # wygenerowanie grafu pełnego
-    # TODO: usunąć krawędzie "dwustronne"
-    list = [[]for i in range(v)]
-
-    if e<(v-1):
+    if round(v*(v-1)/2 * saturation/100)<(v-1):
         print("Unable to generate connected graph")
         return -1
+
+    e = v*v-round(v*(v-1)/2 * saturation/100)          # ilośc krawędzi do usunięcia (na początku mamy v^2 krawędzi)
+
+    matrix = [[1 for i in range(v)]for i in range(v)]   # wygenerowanie grafu pełnego
+
+    list = [[]for i in range(v)]
+
 
     # drzewo jest grafem acyklicznym – opieramy się na drzewie
     for i in range(v):
         matrix[i][i] = 0               # usuwa pętle własne
+    e-=v
 
     root = random.randrange(v)         # losuje korzeń
     for i in range(v):                 # do korzenia nie może nic wchodzić
         matrix[root][i] = 0
+    e-=v-1    # pętla własna już była usunięta
 
-    leaf = random.randrange(v)         # losuje liść
-    for i in range(v):                 # do korzenia nie może nic wchodzić
-        matrix[i][leaf] = 0            # z liścia nie może nic wychodzić
+    leaf = root
+    while root==leaf:
+        leaf = random.randrange(v)         # losuje liść
+    for i in range(v):                     # z liścia nie może nic wychodzić
+        if matrix[i][leaf] == 1:
+            matrix[i][leaf] = 0
+            e-=1
 
-    e-=2*v-2                           # pętle własne już były usunięte
+    for i in range(v-1):                    # zamienia krawędzie dwustronne na jednostronne
+        for j in range(i+1, v):
+            if (matrix[i][j]*matrix[j][i]==1):
+                if(random.randrange(2)==0):     # losuje, którą krawędź usunąć
+                    matrix[i][j]=0
+                else:
+                    matrix[j][i]=0
+                e-=1
 
-    print(root, leaf, e)
-    printMatrix(matrix)
+    while(e>0):                                 # usuwa losowe krawędzie
+        vout = random.randrange(v)              # losuje wierzchołek początkowy...
+        i = 0
+        while (i<=v):
+            vin = random.randrange(v)           # ... i wierzchołek koncowy tak długo aż coś znajdzie
+            if (matrix[vout][vin] == 1):
+                matrix[vout][vin] = 0
+                e-=1
+                break
+            i+=1
 
-    # TODO: usunąć losowe krawędzie
-
+    list = matrixToList(matrix)
     return matrix, list
-
-
 
 
 if __name__ == '__main__':
     matrix, list = generateDAG(5, 60)
-    # printMatrix(matrix)
-    # printList(list)
+    printMatrix(matrix)
+    printList(list)
