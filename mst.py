@@ -6,11 +6,15 @@ def mst_prim_mtrx(adj_mtrx):
     for _ in range(len(adj_mtrx)-1):
         #Szukaj najlżejszej krawędzi
         minimum = max_value
-        for vertex in visited:
-            for neighbor in range(len(adj_mtrx[vertex])):
-                if neighbor not in visited and 0 < adj_mtrx[vertex][neighbor] < minimum :
-                    minimum = adj_mtrx[vertex][neighbor]
-                    edge = (vertex,neighbor)
+        edge = None
+        for start in visited:
+            for end in range(len(adj_mtrx[start])):
+                if end not in visited and 0 < adj_mtrx[start][end] < minimum :
+                    minimum = adj_mtrx[start][end]
+                    edge = (start,end)
+        if not edge:
+            print("none")
+            break
         visited.append(edge[1])
         edges.append(edge)
     return edges
@@ -23,11 +27,15 @@ def mst_prim_list(adj_list):
     for _ in range(len(adj_list)-1):
         #Szukaj najlżejszej krawędzi
         minimum = max_value
+        edge = None
         for start in visited:
             for end in range(len(adj_list[start])):
                 if adj_list[start][end][0] not in visited and adj_list[start][end][1] < minimum :
                     minimum = adj_list[start][end][1]
                     edge = (start,adj_list[start][end][0])
+        if not edge:
+            print("none")
+            break
         visited.append(edge[1])
         edges.append(edge)
     return edges
