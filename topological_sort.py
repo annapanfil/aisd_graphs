@@ -16,10 +16,21 @@ def DFSmatrix(v, matrix, visited = []):
     return visited
 
 if __name__ == '__main__':
-    matrix, list, root = generateDAG(10, 60)
+    matrix, list = generateDAG(5, 60)
     printList(list)
     printMatrix(matrix)
 
-    ordered1 = DFSlist(root, list)
-    ordered2 = DFSmatrix(root, matrix)
-    print(ordered1, "\n", ordered2) # w kolejności od najwcześniej przetworzonego
+    # szuka wierzchołka od którego zacznie – v_in = 0
+    sumout=1
+    root=-1
+
+    while(sumout !=0):
+        root+=1
+        sumout = 0
+        for i in range(len(matrix)):
+            sumout += matrix[i][root]
+
+    ordered1 = DFSlist(root, list, [])
+    print(ordered1)
+    ordered2 = DFSmatrix(root, matrix, [])
+    print(ordered2)
