@@ -79,44 +79,29 @@ def generateUWG(v: int, saturation: int, weight = 9):
 def generateDAG(v: int, saturation: int):
     # generowanie skierowanego acyklicznego grafu spójnego w postaci macierzy sąsiedztwa i listy incydencji
     # v – liczba wierzchołków, saturation – nasycenie w %
+    # 0 jest korzeniem
 
     if round(v*(v-1)/2 * saturation/100)<(v-1):
         print("Unable to generate connected graph")
         return -1
 
-    e = v*v-round(v*(v-1)/2 * saturation/100)          # ilośc krawędzi do usunięcia (na początku mamy v^2 krawędzi)
+    e = ((v-1)*(v-1)/2)-round(v*(v-1)/2 * saturation/100)          # ilośc krawędzi do usunięcia (na początku mamy macierz górnotrójkątną)
 
-    matrix = [[1 for i in range(v)]for i in range(v)]   # wygenerowanie grafu pełnego
+    # generowanie macierzy górnotrójkątnej
+    matrix = [[1 for i in range(v)]for i in range(v)]
+    for i in range(v):
+        for j in range(i, v):
+            matrix[j][i]=0
 
     list = [[]for i in range(v)]
 
-
-    # drzewo jest grafem acyklicznym – opieramy się na drzewie
-    for i in range(v):
-        matrix[i][i] = 0               # usuwa pętle własne
-    e-=v
-
-    root = random.randrange(v)         # losuje korzeń
-    for i in range(v):                 # do korzenia nie może nic wchodzić
-        matrix[i][root] = 0
-    e-=v-1    # pętla własna już była usunięta
-
-    leaf = root
-    while root==leaf:
+    leaf=0
+    while leaf==0:
         leaf = random.randrange(v)         # losuje liść
     for i in range(v):                     # z liścia nie może nic wychodzić
         if matrix[leaf][i] == 1:
             matrix[leaf][i] = 0
             e-=1
-
-    for i in range(v-1):                    # zamienia krawędzie dwustronne na jednostronne
-        for j in range(i+1, v):
-            if (matrix[i][j]*matrix[j][i]==1):
-                # if(random.randrange(2)==0):     # losuje, którą krawędź usunąć
-                #     matrix[i][j]=0
-                # else:
-                matrix[j][i]=0
-                e-=1
 
     while(e>0):                                 # usuwa losowe krawędzie
         vout = random.randrange(v)              # losuje wierzchołek początkowy...
@@ -124,13 +109,18 @@ def generateDAG(v: int, saturation: int):
         while (i<=v):
             vin = random.randrange(v)           # ... i wierzchołek koncowy tak długo aż coś znajdzie
             if (matrix[vout][vin] == 1):
-                matrix[vout][vin] = 0
-                e-=1
+                sumout = 0
+                for i in range(v):       # nie może być 2 korzeni. Sprawdza sumę w kolumnie
+                    sumout += matrix[i][vout]
+                if (sumout != 1):
+                    matrix[vout][vin] = 0
+                    e-=1
                 break
             i+=1
 
     list = matrixToList(matrix)
-    return matrix, list, root
+    return matrix, list
+
 
 if __name__ == '__main__':
     matrix, list = generateDAG(5, 60)
