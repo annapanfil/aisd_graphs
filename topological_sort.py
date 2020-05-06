@@ -15,21 +15,24 @@ def DFSmatrix(v, matrix, visited = []):
     visited.append(v)             # zaznacz się jako przetworzony
     return visited
 
-if __name__ == '__main__':
-    matrix, list = generateDAG(5, 60)
-    printList(list)
-    printMatrix(matrix)
-
+def find_root(matrix):
     # szuka wierzchołka od którego zacznie – v_in = 0
     sumout=1
     root=-1
-
     while(sumout !=0):
         root+=1
         sumout = 0
         for i in range(len(matrix)):
             sumout += matrix[i][root]
 
+    return root
+
+if __name__ == '__main__':
+    matrix, list = generateDAG(5, 60)
+    printList(list)
+    printMatrix(matrix)
+
+    find_root(matrix)
     ordered1 = DFSlist(root, list, [])
     print(ordered1)
     ordered2 = DFSmatrix(root, matrix, [])

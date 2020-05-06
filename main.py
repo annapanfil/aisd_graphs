@@ -35,5 +35,45 @@ def main_ts():
         export_data_to_file(filenames[1], timel/probes)
     return 0
 
+def read_from_file(filename):
+    file = open(filename, "r")
+
+    size = int(file.readline())
+    content = file.readlines()
+    matrix = [row.split() for row in content]
+
+    file.close()
+
+    for i in range(len(matrix)):
+        for j in range(len(matrix[i])):
+            matrix[i][j] = int(matrix[i][j])
+
+    return matrix
+
+
+def main_show():
+    print("\nSORTOWANIE TOPOLOGICZNE\n------------------------\n\nDane:")
+    matrix = read_from_file("data/topol.txt")
+    print(np.array(matrix))
+
+    root = find_root(matrix)
+    order = DFSmatrix(root, matrix, [])
+
+    print("\nPorządek topologiczny: ")
+    for i in reversed(order):
+        print(i+1, end = " ")
+    print("\n")
+
+    print("\nMINIMALNE DRZEWO ROZPINAJĄCE\n-----------------------------\n\nDane:")
+    matrix = read_from_file("data/mst.txt")
+    print(np.array(matrix))
+
+    edges = mst_prim_mtrx(matrix)
+    print("\nKrawędzie MST: ")
+    [print(edge, end=" ") for edge in edges]
+    print("\nSuma wag na krawędziach: ")
+    # TODO: suma wag
+
+
 if __name__ == '__main__':
-    main_ts()
+    main_show()
