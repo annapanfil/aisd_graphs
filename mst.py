@@ -41,11 +41,14 @@ def mst_prim_list(adj_list):
     return edges
     # [print(edge) for edge in edges]
 
+def calculate_weight_sum(adj_mtrx, edges):
+    return sum([adj_mtrx[e[0]][e[1]] for e in edges])
 
 
 if __name__ == '__main__':
 
     mst_prim_list([[(1,8),(2,9),(5,10)],[(0,8),(2,15),(5,20)],[(0,9),(1,15),(4,10)],[(4,7),(5,20)],[(2,10),(3,7)],[(0,10),(1,20),(3,20)]])
     print("matrix")
-    mst_prim_mtrx([[0,8,9,0,0,10],[8,0,15,0,0,20],[9,15,0,0,10,0],[0,0,0,0,7,20],[0,0,10,7,0,0],[10,20,0,20,0,0]])
-
+    adj_mtrx = [[0,8,9,0,0,10],[8,0,15,0,0,20],[9,15,0,0,10,0],[0,0,0,0,7,20],[0,0,10,7,0,0],[10,20,0,20,0,0]]
+    mst = mst_prim_mtrx(adj_mtrx)
+    print(calculate_weight_sum(adj_mtrx,mst))
